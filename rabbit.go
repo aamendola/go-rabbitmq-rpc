@@ -1,10 +1,12 @@
 package rabbit
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
 
+	utils "github.com/aamendola/go-utils"
 	"github.com/streadway/amqp"
 )
 
@@ -39,11 +41,6 @@ func NewClient(host, user, password, queue string, blacklist ...string) *Client 
 func MakeClient(host, user, password, queue string, blacklist ...string) Client {
 	uri := fmt.Sprintf("amqp://%s:%s@%s:5672/", user, password, host)
 	if len(blacklist) > 1 {
-		log.Printf("host:%s", host)
-		log.Printf("user:%s", user)
-		log.Printf("password:%s", password)
-		log.Printf("queue:%s", queue)
-		log.Printf("blacklist:%s", blacklist)
 		panic("The only optional parameter is 'blacklist'")
 	}
 	return Client{uri, queue, blacklist}
@@ -52,16 +49,6 @@ func MakeClient(host, user, password, queue string, blacklist ...string) Client 
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
-	}
-}
-
-func fib(n int) int {
-	if n == 0 {
-		return 0
-	} else if n == 1 {
-		return 1
-	} else {
-		return fib(n-1) + fib(n-2)
 	}
 }
 
@@ -107,11 +94,18 @@ func (c Client) StartConsuming(consumer Consumer) {
 
 	go func() {
 		for d := range msgs {
-			n, err := strconv.Atoi(string(d.Body))
-			failOnError(err, "Failed to convert body to integer")
+			var dat map[string]interface{}
+			err := json.Unmarshal(d.Body, &dat)
+			utils.PanicOnError(err)
 
-			log.Printf(" [.] fib(%d)", n)
-			response := fib(n)
+			message := Message{}
+			json.Unmarshal(d.Body, &message)
+
+			// response := fib(n)
+			err = consumer.Process(message)
+			utils.PanicOnError(err)
+
+			response := 3333
 
 			err = ch.Publish(
 				"",        // exchange
