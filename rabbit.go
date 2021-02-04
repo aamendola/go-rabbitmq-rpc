@@ -39,11 +39,11 @@ func NewClient(host, user, password, queue string, blacklist ...string) *Client 
 func MakeClient(host, user, password, queue string, blacklist ...string) Client {
 	uri := fmt.Sprintf("amqp://%s:%s@%s:5672/", user, password, host)
 	if len(blacklist) > 1 {
-		fmt.Printf("host:%s", host)
-		fmt.Printf("user:%s", user)
-		fmt.Printf("password:%s", password)
-		fmt.Printf("queue:%s", queue)
-		fmt.Printf("blacklist:%s", blacklist)
+		log.Printf("host:%s", host)
+		log.Printf("user:%s", user)
+		log.Printf("password:%s", password)
+		log.Printf("queue:%s", queue)
+		log.Printf("blacklist:%s", blacklist)
 		panic("The only optional parameter is 'blacklist'")
 	}
 	return Client{uri, queue, blacklist}
