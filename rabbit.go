@@ -43,6 +43,7 @@ func MakeClient(host, user, password, queue string, blacklist ...string) Client 
 		fmt.Printf("user:%s", user)
 		fmt.Printf("password:%s", password)
 		fmt.Printf("queue:%s", queue)
+		fmt.Printf("blacklist:%s", blacklist)
 		panic("The only optional parameter is 'blacklist'")
 	}
 	return Client{uri, queue, blacklist}
