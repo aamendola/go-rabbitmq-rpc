@@ -8,6 +8,20 @@ import (
 	"github.com/streadway/amqp"
 )
 
+// Consumer is the interface that you must implement if you want to consume messages
+type Consumer interface {
+	Process(mesage Message) error
+}
+
+// Message ...
+type Message struct {
+	ID       string `json:"id"`
+	Path     string `json:"path"`
+	TraceID  string `json:"traceId"`
+	Type     string `json:"type"`
+	ImageURL string `json:"ImageURL"`
+}
+
 // Client ...
 type Client struct {
 	uri       string
@@ -47,7 +61,7 @@ func fib(n int) int {
 }
 
 // StartConsuming ...
-func (c Client) StartConsuming() {
+func (c Client) StartConsuming(consumer Consumer) {
 	conn, err := amqp.Dial(c.uri)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
