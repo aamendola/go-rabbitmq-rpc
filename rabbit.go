@@ -64,7 +64,7 @@ func (c Client) StartConsuming(consumer Consumer) {
 
 	q, err := ch.QueueDeclare(
 		c.queue, // name
-		false,   // durable
+		true,    // durable
 		false,   // delete when unused
 		false,   // exclusive
 		false,   // no-wait
