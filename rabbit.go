@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strconv"
 
 	utils "github.com/aamendola/go-utils"
 	"github.com/streadway/amqp"
@@ -101,11 +100,8 @@ func (c Client) StartConsuming(consumer Consumer) {
 			message := Message{}
 			json.Unmarshal(d.Body, &message)
 
-			// response := fib(n)
 			err = consumer.Process(message)
 			utils.PanicOnError(err)
-
-			response := 3333
 
 			err = ch.Publish(
 				"",        // exchange
@@ -115,7 +111,7 @@ func (c Client) StartConsuming(consumer Consumer) {
 				amqp.Publishing{
 					ContentType:   "text/plain",
 					CorrelationId: d.CorrelationId,
-					Body:          []byte(strconv.Itoa(response)),
+					Body:          []byte(fmt.Sprintf("The file %s is up for to be downloaded", message.Path)),
 				})
 			failOnError(err, "Failed to publish a message")
 
