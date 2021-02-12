@@ -1,3 +1,6 @@
+github.com/aamendola/go-rabbitmq-topics v1.0.73 h1:7UfIyKzEjjm0/Wj/hY01GRquSWU1Tw63XzNzDO6hjk4=
+github.com/aamendola/go-rabbitmq-topics v1.0.73/go.mod h1:Tb5qvYQnw6tdl2iGtAWXLmaoN4e/KmfwuamdC4m6/do=
+github.com/aamendola/go-utils v1.0.33/go.mod h1:tvSCA/vypwXa6sPN+nMB9aqnGu3FEvbBxHfTb66Q3/s=
 github.com/aamendola/go-utils v1.0.36 h1:TwyHtHiTiqzi06hL/+d7oXJUms/I/7eqlN4puBohkVo=
 github.com/aamendola/go-utils v1.0.36/go.mod h1:tvSCA/vypwXa6sPN+nMB9aqnGu3FEvbBxHfTb66Q3/s=
 github.com/streadway/amqp v1.0.0 h1:kuuDrUJFZL1QYL9hUNuCxNObNzB0bV/ZG5jV3RWAQgo=

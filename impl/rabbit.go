@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	queuer "github.com/aamendola/go-rabbitmq-topics"
 	utils "github.com/aamendola/go-utils"
 	"github.com/streadway/amqp"
 )
@@ -38,7 +39,7 @@ func failOnError(err error, msg string) {
 }
 
 // StartConsuming ...
-func (c Client) StartConsuming(consumer Consumer) {
+func (c Client) StartConsuming(consumer queuer.MessageConsumer) {
 	conn, err := amqp.Dial(c.uri)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -83,7 +84,7 @@ func (c Client) StartConsuming(consumer Consumer) {
 			err := json.Unmarshal(d.Body, &dat)
 			utils.PanicOnError(err)
 
-			message := Message{}
+			message := queuer.Message{}
 			json.Unmarshal(d.Body, &message)
 
 			err = consumer.Process(message)
