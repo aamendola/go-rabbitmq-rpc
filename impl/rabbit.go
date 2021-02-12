@@ -39,7 +39,7 @@ func failOnError(err error, msg string) {
 }
 
 // StartConsuming ...
-func (c Client) StartConsuming(consumer queuer.MessageConsumer) {
+func (c Client) StartConsuming(consumer queuer.Consumer) {
 	conn, err := amqp.Dial(c.uri)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
