@@ -6,7 +6,7 @@ import (
 	"log"
 
 	queuer "github.com/aamendola/go-rabbitmq-rpc"
-	utils "github.com/aamendola/go-utils"
+	logutils "github.com/aamendola/go-utils/log"
 	"github.com/streadway/amqp"
 )
 
@@ -32,20 +32,14 @@ func MakeClient(host, user, password, queue string, blacklist ...string) Client 
 	return Client{uri, queue, blacklist}
 }
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
-}
-
 // StartConsuming ...
 func (c Client) StartConsuming(consumer queuer.Consumer) {
 	conn, err := amqp.Dial(c.uri)
-	failOnError(err, "Failed to connect to RabbitMQ")
+	logutils.Fail(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	logutils.Fail(err, "Failed to open a channel")
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
@@ -56,14 +50,14 @@ func (c Client) StartConsuming(consumer queuer.Consumer) {
 		false,   // no-wait
 		nil,     // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	logutils.Fail(err, "Failed to declare a queue")
 
 	err = ch.Qos(
 		1,     // prefetch count
 		0,     // prefetch size
 		false, // global
 	)
-	failOnError(err, "Failed to set QoS")
+	logutils.Fail(err, "Failed to set QoS")
 
 	msgs, err := ch.Consume(
 		q.Name, // queue
@@ -74,7 +68,7 @@ func (c Client) StartConsuming(consumer queuer.Consumer) {
 		false,  // no-wait
 		nil,    // args
 	)
-	failOnError(err, "Failed to register a consumer")
+	logutils.Fail(err, "Failed to register a consumer")
 
 	forever := make(chan bool)
 
@@ -82,13 +76,13 @@ func (c Client) StartConsuming(consumer queuer.Consumer) {
 		for d := range msgs {
 			var dat map[string]interface{}
 			err := json.Unmarshal(d.Body, &dat)
-			utils.PanicOnError(err)
+			logutils.Fail(err)
 
 			message := queuer.Message{}
 			json.Unmarshal(d.Body, &message)
 
 			err = consumer.Process(message)
-			utils.PanicOnError(err)
+			logutils.Fail(err)
 
 			err = ch.Publish(
 				"",        // exchange
@@ -100,7 +94,7 @@ func (c Client) StartConsuming(consumer queuer.Consumer) {
 					CorrelationId: d.CorrelationId,
 					Body:          []byte(fmt.Sprintf("The file %s is up for to be downloaded", message.Path)),
 				})
-			failOnError(err, "Failed to publish a message")
+			logutils.Fail(err, "Failed to publish a message")
 
 			d.Ack(false)
 		}
